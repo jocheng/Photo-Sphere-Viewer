@@ -10,6 +10,7 @@ import {
     EquirectangularTilesPanorama,
 } from './model';
 import { EquirectangularTileConfig, checkPanoramaConfig, getCacheKey, getTileConfig, getTileConfigByIndex } from './utils';
+import { loadImage } from '../../shared/range-utils';
 
 /* the faces of the top and bottom rows are made of a single triangle (3 vertices)
  * all other faces are made of two triangles (6 vertices)
@@ -453,8 +454,9 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
      * Loads and draw a tile
      */
     private __loadTile(tile: EquirectangularTile, task: Task): Promise<any> {
-        return this.viewer.textureLoader
-            .loadImage(tile.url, null, this.viewer.state.textureData.cacheKey)
+        // return this.viewer.textureLoader
+        //   .loadImage(tile.url, null, this.viewer.state.textureData.cacheKey)
+        return loadImage(tile.url)
             .then((image: HTMLImageElement) => {
                 if (!task.isCancelled()) {
                     if (this.config.debug) {

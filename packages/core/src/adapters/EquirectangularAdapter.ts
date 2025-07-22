@@ -6,6 +6,7 @@ import { SYSTEM } from '../data/system';
 import { EquirectangularPanorama, PanoData, PanoDataProvider, PanoramaPosition, Position, TextureData } from '../model';
 import { createTexture, getConfigParser, getXMPValue, isNil, mergePanoData } from '../utils';
 import { AbstractAdapter, AdapterConstructor } from './AbstractAdapter';
+import { createBlobFromUrl } from '../../../shared/range-utils';
 
 /**
  * Configuration for {@link EquirectangularAdapter}
@@ -113,7 +114,7 @@ export class EquirectangularAdapter extends AbstractAdapter<string | Equirectang
 
     async loadTexture(
         panorama: string | EquirectangularPanorama,
-        loader = true,
+        _loader = true,
         newPanoData?: PanoData | PanoDataProvider,
         useXmpPanoData = this.config.useXmpData,
     ): Promise<EquirectangularTextureData> {
@@ -134,11 +135,16 @@ export class EquirectangularAdapter extends AbstractAdapter<string | Equirectang
             };
         }
 
-        const blob = await this.viewer.textureLoader.loadFile(
-            cleanPanorama.path,
-            loader ? p => this.viewer.textureLoader.dispatchProgress(p) : null,
-            cleanPanorama.path,
-        );
+        // JG +
+        // const blob = await this.viewer.textureLoader.loadFile(
+        //     cleanPanorama.path,
+        //     loader ? p => this.viewer.textureLoader.dispatchProgress(p) : null,
+        //     cleanPanorama.path,
+        // );
+
+        const blob = await createBlobFromUrl(cleanPanorama.path);
+        // JG -
+
         const xmpPanoData = useXmpPanoData ? await this.loadXMP(blob) : null;
         const img = await this.viewer.textureLoader.blobToImage(blob);
 

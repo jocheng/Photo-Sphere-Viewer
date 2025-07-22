@@ -16,6 +16,7 @@
   "scripts": {
     "postinstall": "turbo telemetry disable",
     "build": "turbo run build",
+    "build2": "turbo run build --filter @photo-sphere-viewer/core --filter @photo-sphere-viewer/equirectangular-tiles-adapter",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "serve": "turbo run watch --concurrency 50",
