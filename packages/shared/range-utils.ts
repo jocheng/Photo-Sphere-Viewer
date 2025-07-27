@@ -1,7 +1,9 @@
+const imageCache = new Map<string, Promise<HTMLImageElement>>();
+
 async function fetchRange(
     url: string,
     start: string,
-    end: string,
+    end: string
 ): Promise<Uint8Array> {
     const response = await fetch(url, {
         headers: {
@@ -16,7 +18,7 @@ async function fetchRange(
     return new Uint8Array(await response.arrayBuffer());
 }
 
-function createImageFromBlob(blob: Blob, url: string): Promise<HTMLImageElement> {
+function createImageFromBlob(blob: Blob): Promise<HTMLImageElement> {
     const imgUrl = URL.createObjectURL(blob);
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -36,7 +38,16 @@ export async function createBlobFromUrl(url: string): Promise<Blob> {
     return blob;
 }
 
-export async function loadImage(url: string): Promise<HTMLImageElement> {
-    const blob = await createBlobFromUrl(url);
-    return createImageFromBlob(blob, url);
+export function loadImage(url: string): Promise<HTMLImageElement> {
+    if (imageCache.has(url)) {
+        return imageCache.get(url)!;
+    }
+
+    const promise = (async () => {
+        const blob = await createBlobFromUrl(url);
+        const img = await createImageFromBlob(blob);
+        return img;
+    })();
+    imageCache.set(url, promise);
+    return promise;
 }
